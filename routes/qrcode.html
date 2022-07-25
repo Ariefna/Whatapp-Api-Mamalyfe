@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>WhatsApp Server</title>
+    <meta
+      name="description"
+      content="Kirim tagihan melalui WhatsApp secara otomatis."
+    />
+    <meta
+      name="viewport"
+      content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes"
+    />
+    <link rel="icon" type="image/svg" href="./assets/icon.svg" />
+    <link rel="stylesheet" type="text/css" href="./assets/main.css" />
+  </head>
+  <body>
+    <header>
+      <div class="logo">
+        <!-- <img src="./assets/logo.svg" /> -->
+        <h2>WhatsApp Server</h2>
+      </div>
+      <p>Kirim tagihan (atau pesan apapun) melalui WhatsApp secara otomatis.</p>
+    </header>
+    <main>
+      <section class="middle">
+        <div class="guide-sec">
+          <div class="card">
+            <div class="title">Panduan</div>
+            <div class="body">
+              <ol>
+                <li>[POST] http://axemple.com/msg/</li>
+                <li>
+                  Contoh Request Body {"nomor": "6288217201563","pesan":
+                  "Pesan"}
+                </li>
+                <li>
+                  Jangan spam ke banyak nomor yang tidak dikenal, karena
+                  beresiko dilaporkan orang lain sebagai spam.
+                </li>
+                <li>
+                  <b
+                    >Jangan gunakan nomor whatsapp utama, untuk jaga-jaga
+                    saja.</b
+                  >
+                  (walaupun selama ini saya pakai dengan nomor utama aman aman
+                  saja)
+                </li>
+                <li>
+                  Scan kode QR berikut dengan aplikasi WhatsApp anda,
+                  sebagaimana Whatsapp Web biasanya.
+                </li>
+                <li>
+                  Sesi Whatsapp Web yang aktif akan keluar, diganti dengan
+                  server ini.
+                </li>
+                <li><b>Gunakan dengan bijak.</b></li>
+              </ol>
+            </div>
+          </div>
+        </div>
+        <div class="qr-wrapper">
+          <div class="card" id="qrcode_div">
+            <div class="title">Kode QR</div>
+            <div class="body">
+              <img src="./assets/loader.gif" alt="loading" id="qrcode" />
+            </div>
+          </div>
+          <div class="card">
+            <div class="title">Log</div>
+            <div class="logs"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <p title="dibuat pada 5 Maret 2021 - ">
+        dibuat dengan <span>&hearts;</span> oleh
+        <a href="https://github.com/Ariefna">Arief Nur Abdullah</a>
+      </p>
+    </footer>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      $(document).ready(function () {
+        var socket = io();
+        $("#qrcode_div").hide();
+        $(".logs").prepend(
+          $("<p class='text-start'>").text("Tunggu Sebentar...")
+        );
+        socket.on("message", function (msg) {
+          $(".logs").prepend($("<p class='text-start'>").text(msg));
+        });
+        socket.on("authenticated", function (msg) {
+          //   $("#qrcode").hide();
+          $("#qrcode_div").hide();
+          $(".logs").prepend($("<p class='text-start'>").text(msg));
+        });
+
+        socket.on("qr", function (src) {
+          $("#qrcode").attr("src", src);
+          //   $("#qrcode").show();
+          $("#qrcode_div").show();
+        });
+
+        socket.on("ready", function (data) {
+          //   $("#qrcode").hide();
+          $("#qrcode_div").hide();
+        });
+
+        socket.on("authenticated", function (data) {
+          //   $("#qrcode").hide();
+          $("#qrcode_div").hide();
+        });
+      });
+    </script>
+  </body>
+</html>
