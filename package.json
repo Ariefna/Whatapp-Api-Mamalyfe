@@ -15,6 +15,7 @@
     "express": "^4.17.1",
     "express-fileupload": "^1.2.0",
     "express-validator": "^6.9.2",
+    "format-helper": "^1.0.8",
     "http": "0.0.1-security",
     "mime-types": "^2.1.32",
     "qrcode": "^1.4.4",

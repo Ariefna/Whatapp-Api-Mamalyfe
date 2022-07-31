@@ -1,11 +1,13 @@
-const { Client, LegacySessionAuth, MessageMedia } = require("whatsapp-web.js");
+const { Client, LocalAuth, MessageMedia } = require("whatsapp-web.js");
 const express = require("express");
 const socketIO = require("socket.io");
 const qrcode = require("qrcode");
 const http = require("http");
 const fs = require("fs");
 const fileUpload = require("express-fileupload");
-const port = process.env.PORT || 3000;
+const { success, error, validation } = require("./responseApi");
+require("dotenv").config();
+const port = process.env.APP_PORT || 8081;
 const tools = require("./logger.js");
 require("dotenv").config();
 const axios = require("axios");
@@ -23,9 +25,19 @@ const client = new Client({
   restartOnAuthFail: true,
   puppeteer: {
     headless: true,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    args: [
+      "--no-sandbox",
+      "--unhandled-rejections=strict",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-accelerated-2d-canvas",
+      "--no-first-run",
+      "--no-zygote",
+      "--single-process", // <- this one doesn't works in Windows
+      "--disable-gpu",
+    ],
   },
-  authStrategy: new LegacySessionAuth(),
+  authStrategy: new LocalAuth(),
 });
 client.initialize();
 function delay() {
@@ -34,11 +46,7 @@ function delay() {
   });
 }
 function getStandardResponse(status, message, data) {
-  return {
-    status: status,
-    message: message,
-    data: data,
-  };
+  return { success: status, message: message, data: { data } };
 }
 app.use("/assets", express.static(__dirname + "/assets"));
 
@@ -54,7 +62,7 @@ app.use(
   })
 );
 app.get("/", (req, res) => {
-  res.sendFile("/routes/qrcode.html", {
+  res.sendFile("/qr.html", {
     root: __dirname,
   });
 });
@@ -84,7 +92,6 @@ app.post("/msg_media", async (req, res) => {
       });
     })
     .catch((err) => {
-      console.log(err);
       return res.status(500).json({
         status: false,
         response: err,
@@ -120,7 +127,6 @@ app.post("/msg", async (req, res) => {
 
 // Socket IO
 io.on("connection", function (socket) {
-  // socket.emit("message", "Connecting...");
   client.on("qr", (qr) => {
     qrcode.toDataURL(qr, (err, url) => {
       socket.emit("qr", url);
