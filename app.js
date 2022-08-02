@@ -66,6 +66,11 @@ app.get("/", (req, res) => {
     root: __dirname,
   });
 });
+app.get("/form", (req, res) => {
+  res.sendFile("/send.html", {
+    root: __dirname,
+  });
+});
 app.post("/msg_media", async (req, res) => {
   var number = req.body.nomor;
   const caption = req.body.pesan;
