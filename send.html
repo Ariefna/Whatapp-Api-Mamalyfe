@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Wabill</title>
+    <title>Server WhatsApp</title>
     <meta
       name="description"
       content="Kirim tagihan melalui WhatsApp secara otomatis."
@@ -65,22 +65,41 @@
                 id="data"
                 autofocus
                 placeholder="Tempelkan data anda dari excel/google sheets di sini. pastikan baris pertama merupakan nama dari kolomnya. pastikan kolom pertama merupakan nomor whatsapp tujuan."
-              ></textarea>
+              >
+              nomor	nama	tagihan
+              6288217201563	Orang	Rp 10.000
+              6288217201563	Orang	Rp 10.001
+              6288217201563	Orang	Rp 10.002
+              6288217201563	Orang	Rp 10.003
+              6288217201563	Orang	Rp 10.004
+              6288217201563	Orang	Rp 10.005
+              6288217201563	Orang	Rp 10.006
+              6288217201563	Orang	Rp 10.007
+              6288217201563	Orang	Rp 10.008
+              6288217201563	Orang	Rp 10.009
+              6288217201563	Orang	Rp 10.010
+              6288217201563	Orang	Rp 10.011
+              6288217201563	Orang	Rp 10.012
+              6288217201563	Orang	Rp 10.013
+              6288217201563	Orang	Rp 10.014
+              6288217201563	Orang	Rp 10.015
+              6288217201563	Orang	Rp 10.016</textarea
+              >
             </div>
             <div class="footer">
               <button id="format" onclick="formatData()">format</button>
-              <button
+              <!-- <button
                 id="save-template"
                 class="outline"
                 onclick="toast('fitur simpan belum tersedia')"
               >
                 simpan
-              </button>
+              </button> -->
               <button class="outline" id="reset" onclick="resetData()">
                 reset
               </button>
               <button class="outline" id="edit" onclick="editData()">
-                edit
+                edit & simpan
               </button>
             </div>
           </div>
@@ -102,7 +121,17 @@
               <textarea
                 id="template"
                 placeholder="Masukkan template pesan anda di sini"
-              ></textarea>
+              >
+Pelanggan Yth,
+          
+              Bersama ini kami informasikan tagihan Wabill Anda {nomor} atas nama {nama}, bln tagihan 08-2021 sebesar {tagihan} akan jatuh tempo pada tanggal 05-09-2021.
+          
+              Mohon segera lakukan pembayaran agar Wabill Anda tdk terisolir.
+          
+              Abaikan notifikasi ini jika sudah melakukan pembayaran.
+          
+              Terima kasih</textarea
+              >
             </div>
             <div class="footer">
               <div></div>
@@ -119,5 +148,13 @@
       </p>
     </footer>
     <script src="./assets/main.js"></script>
+    <script>
+      document.getElementById("server").value = window.location.origin;
+      var nomorget = localStorage.getItem("nomor");
+      if (nomorget != null) {
+        document.getElementById("data").value = nomorget;
+      }
+      document.getElementById("server").value = window.location.origin;
+    </script>
   </body>
 </html>

@@ -113,6 +113,8 @@ let editData = () => {
 
   document.querySelector(".data-input table thead").innerHTML = "";
   document.querySelector(".data-input table tbody").innerHTML = "";
+  var nomor = document.querySelector(".data-input textarea").value;
+  localStorage.setItem("nomor", nomor);
 };
 
 let resetData = () => {
