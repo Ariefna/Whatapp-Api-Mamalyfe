@@ -136,7 +136,6 @@ let connectCounter = 0;
 let user = "";
 io.on("connection", function (socket) {
   connectCounter++;
-  console.log(connectCounter);
   if (user == "" || connectCounter == 0) {
     user = socket.id;
   }
@@ -144,16 +143,14 @@ io.on("connection", function (socket) {
     socket.emit("message", "Maaf Pengguna Maksimal 1");
   }
   client.on("qr", (qr) => {
-    if (connectCounter == 1 && socket.id == user) {
-      qrcode.toDataURL(qr, (err, url) => {
-        socket.emit("qr", url);
-        socket.emit("message", "QR Code received, scan please!");
-        tools.logger.info("QR Code received, scan please!", {
-          label: "CLASS2",
-        });
-        console.log(err);
+    qrcode.toDataURL(qr, (err, url) => {
+      socket.emit("qr", url);
+      socket.emit("message", "QR Code received, scan please!");
+      tools.logger.info("QR Code received, scan please!", {
+        label: "CLASS2",
       });
-    }
+      console.log(err);
+    });
   });
 
   client.on("ready", () => {
