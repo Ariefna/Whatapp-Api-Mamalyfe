@@ -43,7 +43,7 @@ const client = new Client({
 client.initialize();
 function delay() {
   return new Promise(function (resolve) {
-    setTimeout(resolve, Math.random() * 100);
+    setTimeout(resolve, Math.random() * 1000);
   });
 }
 function getStandardResponse(status, message, data) {
