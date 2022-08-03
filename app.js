@@ -25,6 +25,7 @@ const client = new Client({
   restartOnAuthFail: true,
   puppeteer: {
     headless: true,
+    // executablePath: "/usr/bin/chromium-browser",
     args: [
       "--no-sandbox",
       "--unhandled-rejections=strict",
@@ -131,16 +132,28 @@ app.post("/msg", async (req, res) => {
 });
 
 // Socket IO
+let connectCounter = 0;
+let user = "";
 io.on("connection", function (socket) {
+  connectCounter++;
+  console.log(connectCounter);
+  if (user == "" || connectCounter == 0) {
+    user = socket.id;
+  }
+  if (connectCounter > 1 && socket.id != user) {
+    socket.emit("message", "Maaf Pengguna Maksimal 1");
+  }
   client.on("qr", (qr) => {
-    qrcode.toDataURL(qr, (err, url) => {
-      socket.emit("qr", url);
-      socket.emit("message", "QR Code received, scan please!");
-      tools.logger.info("QR Code received, scan please!", {
-        label: "CLASS2",
+    if (connectCounter == 1 && socket.id == user) {
+      qrcode.toDataURL(qr, (err, url) => {
+        socket.emit("qr", url);
+        socket.emit("message", "QR Code received, scan please!");
+        tools.logger.info("QR Code received, scan please!", {
+          label: "CLASS2",
+        });
+        console.log(err);
       });
-      console.log(err);
-    });
+    }
   });
 
   client.on("ready", () => {
@@ -170,7 +183,30 @@ io.on("connection", function (socket) {
     client.destroy();
     client.initialize();
   });
+  socket.on("disconnect", function () {
+    console.log("DISCONNESSO!!! ");
+    connectCounter--;
+    io.sockets.emit("count", {
+      number: connectCounter,
+    });
+  });
 });
+// let count;
+// io.sockets.on("connection", function (socket) {
+//   count++;
+//   io.sockets.emit("count", {
+//     number: count,
+//   });
+
+//   socket.on("disconnect", function () {
+//     console.log("DISCONNESSO!!! ");
+//     count--;
+//     io.sockets.emit("count", {
+//       number: count,
+//     });
+//   });
+// });
+
 // Socket IO
 
 const checkRegisteredNumber = async function (number) {
