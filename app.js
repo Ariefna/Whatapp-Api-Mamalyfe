@@ -24,8 +24,8 @@ const io = socketIO(server);
 const client = new Client({
   restartOnAuthFail: true,
   puppeteer: {
-    headless: true,
-    executablePath: "/usr/bin/chromium-browser",
+    headless: false,
+    // executablePath: "/usr/bin/chromium-browser",
     args: [
       "--no-sandbox",
       "--unhandled-rejections=strict",
@@ -105,30 +105,43 @@ app.post("/msg_media", async (req, res) => {
     });
 });
 app.post("/msg", async (req, res) => {
-  const isRegisteredNumber = await checkRegisteredNumber(req.body.nomor);
-  if (!isRegisteredNumber) {
-    tools.logger.info("The number is not registered! " + req.body.nomor, {
-      label: "CLASS2",
-    });
-    return res.status(422).json({
+  try {
+    if (!req.body.nomor.endsWith("@c.us")) {
+      req.body.nomor += "@c.us";
+    }
+    // console.log(req.body.nomor);
+    const isRegisteredNumber = await checkRegisteredNumber(req.body.nomor);
+    // const isRegisteredNumber = true;
+    if (!isRegisteredNumber) {
+      tools.logger.info("The number is not registered! " + req.body.nomor, {
+        label: "CLASS2",
+      });
+      return res.status(422).json({
+        status: false,
+        message: "The number is not registered",
+      });
+    }
+    const user = await client.getNumberId(req.body.nomor);
+    const chatId = user._serialized;
+    tools.logger.info(
+      "Kirim Pesan ke Nomor " +
+        req.body.nomor +
+        " Dengan Pesan " +
+        req.body.pesan,
+      {
+        label: "CLASS2",
+      }
+    );
+    delay();
+    client.sendMessage(chatId, req.body.pesan);
+    return res.json(getStandardResponse(true, "Berhasil", []));
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
       status: false,
-      message: "The number is not registered",
+      response: error,
     });
   }
-  const user = await client.getNumberId(req.body.nomor);
-  const chatId = user._serialized;
-  tools.logger.info(
-    "Kirim Pesan ke Nomor " +
-      req.body.nomor +
-      " Dengan Pesan " +
-      req.body.pesan,
-    {
-      label: "CLASS2",
-    }
-  );
-  delay();
-  client.sendMessage(chatId, req.body.pesan);
-  return res.json(getStandardResponse(true, "Berhasil", []));
 });
 
 // Socket IO
